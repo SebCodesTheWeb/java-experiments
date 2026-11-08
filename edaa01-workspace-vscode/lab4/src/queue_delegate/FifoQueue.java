@@ -17,7 +17,7 @@ public class FifoQueue<E> extends AbstractQueue<E> {
 	 * 			to this queue, else false
 	 */
 	public boolean offer(E e) {
-		return false;
+		return list.offer(e);
 	}
 
 	/**	
