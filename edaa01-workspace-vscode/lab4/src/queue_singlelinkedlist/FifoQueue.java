@@ -21,8 +21,15 @@ public class FifoQueue<E> extends AbstractQueue<E> {
 	public boolean offer(E e) {
 		try{
 			QueueNode<E> newestNode = new QueueNode<E>(e);
-			last.next = newestNode;
-			last.next.next = newestNode;
+			if(size == 0) {
+				last.next = newestNode;
+				last.next.next = newestNode;
+			}
+			if(size >= 1) {
+				newestNode.next = last.next.next;
+				last.next.next = newestNode;
+				last.next = newestNode;
+			}
 			size += 1;
 		} catch(Exception error) {
 			return false;
@@ -58,7 +65,19 @@ public class FifoQueue<E> extends AbstractQueue<E> {
 	 * @return 	the head of this queue, or null if the queue is empty 
 	 */
 	public E poll() {
-		return null;
+		E head = peek();
+		if (size == 0) {
+			return null;
+		}
+		if (size == 1) {
+			last.next = null;
+			size -= 1;
+		}
+		if (size >= 2) {
+			last.next.next = last.next.next.next;
+			size -= 1;
+		}
+		return head;
 	}
 	
 	/**	
@@ -66,8 +85,30 @@ public class FifoQueue<E> extends AbstractQueue<E> {
 	 * @return an iterator over the elements in this queue
 	 */	
 	public Iterator<E> iterator() {
-		return null;
+		return new QueueIterator();
 	}
+
+	private class QueueIterator implements Iterator<E> {
+      private QueueNode<E> pos = last.next;
+	  private boolean hasStarted = false;
+
+      private QueueIterator() {
+
+	  }
+      public boolean hasNext() {
+		return size >= 1 && ((pos != last.next) || !hasStarted);
+	  }
+
+      public E next() {
+		if(!hasNext()) {
+			throw new NoSuchElementException("The iteration has no more elements");
+		}
+		hasStarted = true;
+		E nextElement = pos.next.element;
+		pos = pos.next;
+		return nextElement;
+	  }
+   }
 	
 	private static class QueueNode<E> {
 		E element;
