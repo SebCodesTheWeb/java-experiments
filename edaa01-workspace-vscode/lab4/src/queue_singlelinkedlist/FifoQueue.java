@@ -20,15 +20,19 @@ public class FifoQueue<E> extends AbstractQueue<E> {
 	 */
 	public boolean offer(E e) {
 		try{
-			QueueNode<E> newestNode = new QueueNode<E>(e);
+			QueueNode<E> NodeToAdd = new QueueNode<E>(e);
 			if(size == 0) {
-				last.next = newestNode;
-				last.next.next = newestNode;
+				//vid initialisering, appenda noden och loopa runt den till sig själv 
+				last.next = NodeToAdd;
+				NodeToAdd.next = NodeToAdd;
 			}
 			if(size >= 1) {
-				newestNode.next = last.next.next;
-				last.next.next = newestNode;
-				last.next = newestNode;
+				QueueNode<E> FirstNode = last.next.next;
+				QueueNode<E> LastNode = last.next;
+
+				NodeToAdd.next = FirstNode;
+				LastNode.next = NodeToAdd;
+				last.next = NodeToAdd;
 			}
 			size += 1;
 		} catch(Exception error) {
@@ -55,7 +59,9 @@ public class FifoQueue<E> extends AbstractQueue<E> {
 		if (size == 0) {
 			return null;
 		}
-		return last.next.next.element;
+
+		QueueNode<E> FirstNode = last.next.next;
+		return FirstNode.element;
 	}
 
 	/**	
@@ -66,6 +72,7 @@ public class FifoQueue<E> extends AbstractQueue<E> {
 	 */
 	public E poll() {
 		E head = peek();
+
 		if (size == 0) {
 			return null;
 		}
@@ -74,7 +81,10 @@ public class FifoQueue<E> extends AbstractQueue<E> {
 			size -= 1;
 		}
 		if (size >= 2) {
-			last.next.next = last.next.next.next;
+			QueueNode<E> FirstNode = last.next.next;
+			QueueNode<E> LastNode = last.next;
+
+			LastNode.next = FirstNode.next;
 			size -= 1;
 		}
 		return head;
@@ -89,14 +99,15 @@ public class FifoQueue<E> extends AbstractQueue<E> {
 	}
 
 	private class QueueIterator implements Iterator<E> {
-      private QueueNode<E> pos = last.next;
+	  QueueNode<E> LastNode = last.next;
+      private QueueNode<E> pos = LastNode;
 	  private boolean hasStarted = false;
 
       private QueueIterator() {
 
 	  }
       public boolean hasNext() {
-		return size >= 1 && ((pos != last.next) || !hasStarted);
+		return size >= 1 && ((pos != LastNode) || !hasStarted); // when pos == LastNode then a loop has occured and no more elements to check exist
 	  }
 
       public E next() {
