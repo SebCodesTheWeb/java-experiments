@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import queue_singlelinkedlist.FifoQueue;
 
 
-class secondtestfile {
+class TestAppendFifoQueue {
 	private FifoQueue<Integer> q1;
 	private FifoQueue<Integer> q2;
 
